@@ -1,4 +1,4 @@
-﻿namespace ESTree.Tests;
+﻿namespace EStateTree.Tests;
 
 public class MachineTests
 {

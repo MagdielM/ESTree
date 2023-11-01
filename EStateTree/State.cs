@@ -1,4 +1,4 @@
-﻿namespace ESTree;
+﻿namespace EStateTree;
 
 public class State
 {

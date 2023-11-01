@@ -1,3 +1,3 @@
-﻿namespace ESTree;
+﻿namespace EStateTree;
 
 public readonly record struct EventId(string Id);
