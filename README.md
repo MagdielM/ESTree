@@ -1,5 +1,5 @@
-# ESTree
+# EStateTree
 
-ESTree is a simple, flexible state tree implementation which facilitates modelling complex behaviors compositionally.
+EStateTree is a simple, flexible state tree implementation which facilitates modelling complex behaviors compositionally.
 
 Documentation in progress...
