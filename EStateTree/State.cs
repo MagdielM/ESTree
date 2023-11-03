@@ -54,6 +54,9 @@ public class State
         if (child == this)
             throw new ArgumentException("State may not add itself to its children.", nameof(child));
 
+        if (child.Parent != null)
+            throw new InvalidOperationException("Child must be removed from current parent before being added to new parent.");
+
         Children.Add(child.Id, child);
 
         child.Parent = this;
