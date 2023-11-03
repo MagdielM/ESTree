@@ -24,7 +24,7 @@ public class State
         if (string.IsNullOrWhiteSpace(id.Id))
         {
             throw new ArgumentException(
-                "State ID may not be null, empty, or comprised solely by white-space.",
+                "State ID may not be null, empty, or comprised solely of white-space.",
                 nameof(id));
         }
 
