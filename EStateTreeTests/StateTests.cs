@@ -108,6 +108,16 @@ public class StateTests
     }
 
     [Fact]
+    public void State_AddChild_ThrowsInvalidOperationExceptionIfChildAlreadyHasParent()
+    {
+        State child = new(new StateId("child"));
+        State newParent = new(new StateId("newparent"));
+        _state.AddChild(child);
+
+        Assert.Throws<InvalidOperationException>(() => _state.AddChild(child));
+    }
+
+    [Fact]
     public void State_AddChild_SetsDefaultAndActiveChildIdsToFirstChild()
     {
         State child = new(new StateId("child1"));
@@ -667,6 +677,33 @@ public class StateTests
         _state.AddChild(from);
 
         Assert.Throws<ArgumentException>(() => _state.AddTransition(from.Id, to.Id, new EventId("event")));
+    }
+
+    [Fact]
+    public void State_AddTransition_ThrowsArgumentExceptionIfFromStateIsTheSameAsToState()
+    {
+        State from = new(new StateId("from"));
+        StateId fromId = new("from");
+        _state.AddChild(from);
+
+        Assert.Throws<ArgumentException>(() => _state.AddTransition(from.Id, fromId, new EventId("event")));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("   ")]
+    [InlineData("\t")]
+    [InlineData("\n")]
+    public void State_AddTransition_ThrowsArgumentExceptionIfOnEventIdIsNullEmptyOrWhiteSpace(string eventId)
+    {
+        State from = new(new StateId("from"));
+        State to = new(new StateId("to"));
+        _state.AddChild(from);
+        _state.AddChild(to);
+
+        Assert.Throws<ArgumentException>(() => _state.AddTransition(from.Id, to.Id, new EventId(eventId)));
     }
 
     [Fact]
