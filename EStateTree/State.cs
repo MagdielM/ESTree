@@ -126,13 +126,16 @@ public class State
     public State AddTransition(StateId from, StateId to, EventId on, Func<bool>? condition = null, Action? behavior = null)
     {
         if (!Children.ContainsKey(from))
-        {
             throw new ArgumentException("State does not contain child with the given ID.", nameof(from));
-        }
+
         if (!Children.ContainsKey(to))
-        {
             throw new ArgumentException("State does not contain child with the given ID.", nameof(to));
-        }
+
+        if (from == to)
+            throw new ArgumentException($"{nameof(from)} may not be equal to {nameof(to)}.", nameof(to));
+
+        if (string.IsNullOrWhiteSpace(on.Id))
+            throw new ArgumentException("Event ID must not be null, empty, or comprised solely of whitespace.", nameof(on));
 
         Transitions.Add(new TransitionId(on, from), new Transition(to, condition, behavior));
 
