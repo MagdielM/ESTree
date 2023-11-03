@@ -227,11 +227,11 @@ public class State
 
     protected void ExitState()
     {
-        exitBehavior?.Invoke();
         if (Children.TryGetValue(ActiveChildId, out State child))
         {
             child.ExitState();
         }
+        exitBehavior?.Invoke();
     }
 
     private bool TryHandleEvent(EventId eventId)
