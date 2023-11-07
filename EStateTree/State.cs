@@ -157,7 +157,11 @@ public class State
     /// </exception>
     ///
     /// <exception cref="InvalidOperationException">
-    /// The specified child already has a parent.
+    /// <para>The specified child already has a parent.</para>
+    ///
+    /// <para>-or-</para>
+    ///
+    /// <para>A cycle would be created in the hierarchy if the child was added.</para>
     /// </exception>
     public State AddChild(State child)
     {
@@ -166,6 +170,15 @@ public class State
 
         if (child.Parent != null)
             throw new InvalidOperationException("Child must be removed from current parent before being added to new parent.");
+
+        for (State? check = Parent; check != null; check = check.Parent)
+        {
+            if (check == child)
+            {
+                throw new InvalidOperationException($"Parenting {child.Id} to {Id} would create a cycle in the hierarchy."
+                    + " This is not supported.");
+            }
+        }
 
         Children.Add(child.Id, child);
 
