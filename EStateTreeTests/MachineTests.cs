@@ -92,4 +92,56 @@ public class MachineTests
 
         Assert.Equal(1, count);
     }
+
+    [Fact]
+    public void Machine_SendEvent_DoesNothingIfCalledBeforeCallingEnter()
+    {
+        EventId eventId = new("event");
+        int count = 0;
+        _machine.EventResponses.Add(
+            eventId,
+            new EventResponse(() => count++, true));
+
+        _machine.SendEvent(eventId);
+
+        Assert.Equal(0, count);
+    }
+
+    [Fact]
+    public void Machine_BubbleEvent_DoesNothingIfCalledBeforeCallingEnter()
+    {
+        int count = 0;
+        State child = new("child");
+        State grandChild = new("grandchild");
+        child.AddChild(grandChild);
+        _machine.AddChild(child);
+        EventId eventId = new("event");
+        EventResponse response = new(() => count++, true);
+        grandChild.EventResponses.Add(eventId, response);
+
+        _machine.BubbleEvent(eventId);
+
+        Assert.Equal(0, count);
+    }
+
+    [Fact]
+    public void Machine_BubbleEvent_FiresEventFromInnermostActiveStateInBranch()
+    {
+        int count = 0;
+        State child = new("child");
+        State grandChild = new("grandchild");
+        child.AddChild(grandChild);
+        _machine.AddChild(child);
+        EventId eventId = new("event");
+        EventResponse response = new(() => count++, true);
+        grandChild.EventResponses.Add(eventId, response);
+        _machine.EventResponses.Add(eventId, response);
+
+        Console.WriteLine($"{_machine.ActiveChildId.Id}");
+
+        _machine.Enter();
+        _machine.BubbleEvent(eventId);
+
+        Assert.Equal(1, count);
+    }
 }
