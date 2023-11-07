@@ -45,4 +45,35 @@ public class Machine : State
         ExitState();
         entered = false;
     }
+
+    /// <summary>
+    /// Attempts to consume the specified event and drills it down the hierarchy if it cannot.
+    /// </summary>
+    /// <param name="id">The ID of the specified event.</param>
+    public void SendEvent(EventId id)
+    {
+        if (!entered) return;
+
+        if (TryTransition(id)) return;
+        if (TryHandleEvent(id)) return;
+        DrillEvent(id);
+    }
+
+    /// <summary>
+    /// Fires an event from the innermost state in the active branch.
+    /// </summary>
+    /// <param name="id">The ID of the specified event</param>
+    public void BubbleEvent(EventId id)
+    {
+        if (!entered) return;
+
+        State activeLeaf = this;
+
+        while (activeLeaf.ActiveChildId != default)
+        {
+            activeLeaf = activeLeaf[activeLeaf.ActiveChildId];
+        }
+
+        activeLeaf.FireEvent(id);
+    }
 }
