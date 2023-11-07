@@ -13,4 +13,9 @@
 /// <param name="Behavior">
 /// An action to be invoked when the reansition is performed.
 /// </param>
-public readonly record struct Transition(StateId To, Func<bool>? Condition, Action? Behavior);
+///
+/// <param name="IsShallow">
+/// Determines whether or not the transition exits and enters the entire active branch when
+/// performed.
+/// </param>
+public readonly record struct Transition(StateId To, Func<bool>? Condition, Action? Behavior, bool IsShallow = true);

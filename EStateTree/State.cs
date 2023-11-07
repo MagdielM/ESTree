@@ -34,6 +34,13 @@
 /// </para>
 ///
 /// <para>
+/// Transitions are marked as "shallow" by default. A shallow transition will only perform the
+/// entry and exit behaviors of the states that are involved in the transition. Non-shallow
+/// transitions will also execute the entry and exit behaviors of all states in the active
+/// branches of the involved states.
+/// </para>
+///
+/// <para>
 /// States may propagate events up and down the active branch. Events are defined as
 /// <see cref="EventId"/>s. Upon receiving an event, A state may choose to respond by
 /// executing custom behavior or performing a transition. Said state may also consume the
@@ -300,6 +307,11 @@ public class State
     /// An action to be invoked when the transition is performed.
     /// </param>
     ///
+    /// <param name="isShallow">
+    /// Determines whether or not the transition exits and enters the entire active branch
+    /// when performed.
+    /// </param>
+    ///
     /// <returns>
     /// The calling state, so that calls to this method may be chained with other calls.
     /// </returns>
@@ -320,7 +332,7 @@ public class State
     /// comprised solely of whitespace.
     /// </para>
     /// </exception>
-    public State AddTransition(StateId from, StateId to, EventId on, Func<bool>? condition = null, Action? behavior = null)
+    public State AddTransition(StateId from, StateId to, EventId on, Func<bool>? condition = null, Action? behavior = null, bool isShallow = true)
     {
         if (!Children.ContainsKey(from))
             throw new ArgumentException("State does not contain child with the given ID.", nameof(from));
@@ -334,7 +346,7 @@ public class State
         if (string.IsNullOrWhiteSpace(on.Id))
             throw new ArgumentException("Event ID must not be null, empty, or comprised solely of whitespace.", nameof(on));
 
-        Transitions.Add(new TransitionId(on, from), new Transition(to, condition, behavior));
+        Transitions.Add(new TransitionId(on, from), new Transition(to, condition, behavior, isShallow));
 
         return this;
     }
@@ -576,10 +588,26 @@ public class State
 
         if (transition.Condition?.Invoke() == false) return false;
 
+        if (transition.IsShallow)
+        {
+            Children[ActiveChildId].exitBehavior?.Invoke();
+        }
+        else
+        {
         Children[ActiveChildId].ExitState();
+        }
+
         transition.Behavior?.Invoke();
         ActiveChildId = transition.To;
+
+        if (transition.IsShallow)
+        {
+            Children[ActiveChildId].enterBehavior?.Invoke();
+        }
+        else
+        {
         Children[ActiveChildId].EnterState();
+        }
 
         return true;
     }
