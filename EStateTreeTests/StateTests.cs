@@ -24,7 +24,7 @@ public class StateTests
     [Fact]
     public void State_GetChild_ReturnsChild()
     {
-        State child = new(new StateId("child"));
+        State child = new("child");
 
         _state.AddChild(child);
 
@@ -34,7 +34,7 @@ public class StateTests
     [Fact]
     public void State_GetChild_ThrowsKeyNotFoundExceptionIfStateDoesNotContainChild()
     {
-        Assert.Throws<KeyNotFoundException>(() => _state.GetChild(new StateId("child")));
+        Assert.Throws<KeyNotFoundException>(() => _state.GetChild("child"));
     }
 
     [Fact]
@@ -42,9 +42,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
         _state.AddChildren(states);
 
@@ -58,9 +58,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
         _state.AddChildren(states);
         _state.AddTransition(states[0].Id, states[1].Id, new EventId("event1"));
@@ -72,7 +72,7 @@ public class StateTests
     [Fact]
     public void State_AddChild_ReturnsCaller()
     {
-        State child = new(new StateId("child"));
+        State child = new("child");
 
         State caller = _state.AddChild(child);
 
@@ -82,7 +82,7 @@ public class StateTests
     [Fact]
     public void State_AddChild_AddsChildToChildren()
     {
-        State child = new(new StateId("child"));
+        State child = new("child");
 
         _state.AddChild(child);
 
@@ -99,8 +99,8 @@ public class StateTests
     [Fact]
     public void State_AddChild_ThrowsArgumentExceptionIfChildrenAlreadyHasChildWithTheSameId()
     {
-        State child = new(new StateId("child"));
-        State identicalChild = new(new StateId("child"));
+        State child = new("child");
+        State identicalChild = new("child");
 
         _state.AddChild(child);
 
@@ -110,18 +110,29 @@ public class StateTests
     [Fact]
     public void State_AddChild_ThrowsInvalidOperationExceptionIfChildAlreadyHasParent()
     {
-        State child = new(new StateId("child"));
-        State newParent = new(new StateId("newparent"));
+        State child = new("child");
+        State newParent = new("newparent");
         _state.AddChild(child);
 
         Assert.Throws<InvalidOperationException>(() => _state.AddChild(child));
     }
 
     [Fact]
+    public void State_AddChild_ThrowsInvalidOperationExceptionIfAddingChildWouldResultInCycle()
+    {
+        State child = new("child");
+        State grandChild = new("grandchild");
+        _state.AddChild(child);
+        child.AddChild(grandChild);
+
+        Assert.Throws<InvalidOperationException>(() => grandChild.AddChild(_state));
+    }
+
+    [Fact]
     public void State_AddChild_SetsDefaultAndActiveChildIdsToFirstChild()
     {
-        State child = new(new StateId("child1"));
-        State child2 = new(new StateId("child2"));
+        State child = new("child1");
+        State child2 = new("child2");
 
         _state.AddChild(child);
         _state.AddChild(child2);
@@ -133,7 +144,7 @@ public class StateTests
     [Fact]
     public void State_AddChild_SetsSelfAsChildParent()
     {
-        State child = new(new StateId("child1"));
+        State child = new("child1");
         _state.AddChild(child);
 
         Assert.Equal(child.Parent, _state);
@@ -144,7 +155,7 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
+            new("child1"),
         };
 
         State caller = _state.AddChildren(states);
@@ -157,9 +168,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
 
         _state.AddChildren(states);
@@ -174,8 +185,8 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
+            new("child1"),
+            new("child2"),
         };
 
         _state.AddChildren(states);
@@ -190,9 +201,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
 
         _state.AddChildren(states);
@@ -222,10 +233,10 @@ public class StateTests
     }
 
     [Fact]
-    public void State_RemoveChild_ThrowsArgumentExceptionIfDefaultChildRemovedBeforeOthers()
+    public void State_RemoveChild_ThrowsInvalidOperationExceptionIfDefaultChildRemovedBeforeOthers()
     {
-        State child = new(new StateId("child1"));
-        State child2 = new(new StateId("child2"));
+        State child = new("child1");
+        State child2 = new("child2");
 
         _state.AddChild(child);
         _state.AddChild(child2);
@@ -236,7 +247,7 @@ public class StateTests
     [Fact]
     public void State_RemoveChild_SetsChildParentToNull()
     {
-        State child = new(new StateId("child1"));
+        State child = new("child1");
 
         _state.AddChild(child);
         _state.RemoveChild(child.Id);
@@ -247,9 +258,9 @@ public class StateTests
     [Fact]
     public void State_RemoveChild_RemovesAllTransitionsReferencingChild()
     {
-        State first = new(new StateId("first"));
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State first = new("first");
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         _state.AddChild(first);
         _state.AddChild(from);
@@ -281,9 +292,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
 
         _state.AddChildren(states);
@@ -297,13 +308,13 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
         _state.AddChildren(states);
-        _state.AddTransition(states[0].Id, states[1].Id, new("event1"));
-        _state.AddTransition(states[1].Id, states[2].Id, new("event2"));
+        _state.AddTransition(states[0].Id, states[1].Id, new EventId("event1"));
+        _state.AddTransition(states[1].Id, states[2].Id, new EventId("event2"));
 
         _state.ClearChildren();
 
@@ -315,9 +326,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
 
         _state.AddChildren(states);
@@ -332,9 +343,9 @@ public class StateTests
     {
         State[] states = new State[]
         {
-            new State(new StateId("child1")),
-            new State(new StateId("child2")),
-            new State(new StateId("child3")),
+            new("child1"),
+            new("child2"),
+            new("child3"),
         };
 
         _state.AddChildren(states);
@@ -369,7 +380,7 @@ public class StateTests
         _state.EventResponses.Add(
             eventId,
             new EventResponse(() => check = true, true));
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
 
         child.FireEvent(eventId);
@@ -385,7 +396,7 @@ public class StateTests
         _state.EventResponses.Add(
             eventId,
             new EventResponse(() => check = true, false));
-        State child = new(new StateId("child"));
+        State child = new("child");
         child.EventResponses.Add(
             eventId,
             new EventResponse(() => { }, true));
@@ -398,8 +409,8 @@ public class StateTests
     [Fact]
     public void State_FireEvent_TriggersTransitionIfOneExists()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         _state.AddChild(from);
         _state.AddChild(to);
@@ -411,12 +422,28 @@ public class StateTests
     }
 
     [Fact]
+    public void State_FireEvent_DoesNotTriggerTransitionIfTransitionConditionReturnsFalse()
+    {
+        State from = new("from");
+        State to = new("to");
+        EventId transitionEvent = new("event");
+        _state.AddChild(from);
+        _state.AddChild(to);
+        _state.AddTransition(from.Id, to.Id, transitionEvent, () => false);
+
+
+        _state.FireEvent(transitionEvent);
+
+        Assert.Equal(_state.ActiveChildId, from.Id);
+    }
+
+    [Fact]
     public void State_FireEvent_ExitsPreviousActiveChildIfTransitionTriggered()
     {
         bool check = false;
-        State from = new(new StateId("from"));
+        State from = new("from");
         from.AddExitBehavior(() => check = true);
-        State to = new(new StateId("to"));
+        State to = new("to");
         EventId transitionEvent = new("event");
         _state.AddChild(from);
         _state.AddChild(to);
@@ -428,11 +455,32 @@ public class StateTests
     }
 
     [Fact]
+    public void State_FireEvent_ExitsActiveBranchIfNonShallowTransitionTriggered()
+    {
+        bool check = false;
+        State from = new("from");
+        State childOfFrom = new("grandfrom");
+        childOfFrom.AddExitBehavior(() => check = true);
+        from.AddChild(childOfFrom);
+        State to = new("to");
+        State childOfTo = new("grandto");
+        to.AddChild(childOfTo);
+        EventId transitionEvent = new("event");
+        _state.AddChild(from);
+        _state.AddChild(to);
+        _state.AddTransition(from.Id, to.Id, transitionEvent, isShallow: false);
+
+        _state.FireEvent(transitionEvent);
+
+        Assert.True(check);
+    }
+
+    [Fact]
     public void State_FireEvent_EntersNewActiveChildIfTransitionTriggered()
     {
         bool check = false;
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         to.AddEnterBehavior(() => check = true);
         EventId transitionEvent = new("event");
         _state.AddChild(from);
@@ -445,11 +493,32 @@ public class StateTests
     }
 
     [Fact]
+    public void State_FireEvent_EntersNewActiveBranchIfNonShallowTransitionTriggered()
+    {
+        bool check = false;
+        State from = new("from");
+        State childOfFrom = new("grandfrom");
+        from.AddChild(childOfFrom);
+        State to = new("to");
+        State childOfTo = new("grandto");
+        childOfTo.AddEnterBehavior(() => check = true);
+        to.AddChild(childOfTo);
+        EventId transitionEvent = new("event");
+        _state.AddChild(from);
+        _state.AddChild(to);
+        _state.AddTransition(from.Id, to.Id, transitionEvent, isShallow: false);
+
+        _state.FireEvent(transitionEvent);
+
+        Assert.True(check);
+    }
+
+    [Fact]
     public void State_FireEvent_PerformsTransitionBehaviorIfTransitionTriggered()
     {
         bool check = false;
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         _state.AddChild(from);
         _state.AddChild(to);
@@ -467,10 +536,10 @@ public class StateTests
         _state.EventResponses.Add(
             new EventId("MakeCheckTrue"),
             new EventResponse(() => check = true, false));
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         child.AddChild(from);
         child.AddChild(to);
@@ -486,7 +555,7 @@ public class StateTests
     {
         bool check = false;
         EventId eventId = new("MakeCheckTrue");
-        State child = new(new StateId("child"));
+        State child = new("child");
         child.EventResponses.Add(
             eventId,
             new EventResponse(() => check = true, true));
@@ -500,10 +569,10 @@ public class StateTests
     [Fact]
     public void State_DrillEvent_HasActiveChildTriggerTransitionIfOneExists()
     {
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         child.AddChild(from);
         child.AddChild(to);
@@ -515,14 +584,31 @@ public class StateTests
     }
 
     [Fact]
+    public void State_DrillEvent_DoesNotHaveActiveChildTriggerTransitionIfTransitionConditionReturnsFalse()
+    {
+        State child = new("child");
+        _state.AddChild(child);
+        State from = new("from");
+        State to = new("to");
+        EventId transitionEvent = new("event");
+        child.AddChild(from);
+        child.AddChild(to);
+        child.AddTransition(from.Id, to.Id, transitionEvent, () => false);
+
+        _state.DrillEvent(transitionEvent);
+
+        Assert.Equal(child.ActiveChildId, from.Id);
+    }
+
+    [Fact]
     public void State_DrillEvent_HasActiveChildExitPreviousActiveGrandChildIfTransitionTriggered()
     {
         bool check = false;
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
-        State from = new(new StateId("from"));
+        State from = new("from");
         from.AddExitBehavior(() => check = true);
-        State to = new(new StateId("to"));
+        State to = new("to");
         EventId transitionEvent = new("event");
         child.AddChild(from);
         child.AddChild(to);
@@ -534,13 +620,36 @@ public class StateTests
     }
 
     [Fact]
+    public void State_DrillEvent_HasActiveChildExitActiveBranchIfNonShallowTransitionTriggered()
+    {
+        bool check = false;
+        State child = new("child");
+        _state.AddChild(child);
+        State from = new("from");
+        State childOfFrom = new("grandfrom");
+        childOfFrom.AddExitBehavior(() => check = true);
+        from.AddChild(childOfFrom);
+        State to = new("to");
+        State childOfTo = new("grandto");
+        to.AddChild(childOfTo);
+        EventId transitionEvent = new("event");
+        child.AddChild(from);
+        child.AddChild(to);
+        child.AddTransition(from.Id, to.Id, transitionEvent, isShallow: false);
+
+        _state.DrillEvent(transitionEvent);
+
+        Assert.True(check);
+    }
+
+    [Fact]
     public void State_DrillEvent_HasActiveChildEnterNewActiveGrandChildIfTransitionTriggered()
     {
         bool check = false;
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         to.AddEnterBehavior(() => check = true);
         EventId transitionEvent = new("event");
         child.AddChild(from);
@@ -553,13 +662,36 @@ public class StateTests
     }
 
     [Fact]
+    public void State_DrillEvent_HasActiveChildEnterNewActiveBranchIfNonShallowTransitionTriggered()
+    {
+        bool check = false;
+        State child = new("child");
+        _state.AddChild(child);
+        State from = new("from");
+        State childOfFrom = new("grandfrom");
+        from.AddChild(childOfFrom);
+        State to = new("to");
+        State childOfTo = new("grandto");
+        childOfTo.AddEnterBehavior(() => check = true);
+        to.AddChild(childOfTo);
+        EventId transitionEvent = new("event");
+        child.AddChild(from);
+        child.AddChild(to);
+        child.AddTransition(from.Id, to.Id, transitionEvent, isShallow: false);
+
+        _state.DrillEvent(transitionEvent);
+
+        Assert.True(check);
+    }
+
+    [Fact]
     public void State_DrillEvent_HasActiveChildPerformTransitionBehaviorIfTransitionTriggered()
     {
         bool check = false;
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         child.AddChild(from);
         child.AddChild(to);
@@ -575,11 +707,11 @@ public class StateTests
     {
         bool check = false;
         EventId eventId = new("MakeCheckTrue");
-        State child = new(new StateId("child"));
+        State child = new("child");
         child.EventResponses.Add(
             eventId,
             new EventResponse(() => { }, false));
-        State grandchild = new(new StateId("grandchild"));
+        State grandchild = new("grandchild");
         grandchild.EventResponses.Add(
             eventId,
             new EventResponse(() => check = true, true));
@@ -596,11 +728,11 @@ public class StateTests
     {
         bool check = false;
         EventId eventId = new("MakeCheckTrue");
-        State child = new(new StateId("child"));
+        State child = new("child");
         child.EventResponses.Add(
             eventId,
             new EventResponse(() => { }, true));
-        State grandchild = new(new StateId("grandchild"));
+        State grandchild = new("grandchild");
         grandchild.EventResponses.Add(
             eventId,
             new EventResponse(() => check = true, false));
@@ -616,10 +748,10 @@ public class StateTests
     public void State_DrillEvent_HasActiveChildConsumeEventIfTransitionTriggered()
     {
         bool check = false;
-        State child = new(new StateId("child"));
+        State child = new("child");
         _state.AddChild(child);
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         to.EventResponses.Add(
             new EventId("MakeCheckTrue"),
             new EventResponse(() => check = true, false));
@@ -636,8 +768,8 @@ public class StateTests
     [Fact]
     public void State_AddTransition_ReturnsCaller()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         _state.AddChild(from);
         _state.AddChild(to);
 
@@ -649,8 +781,8 @@ public class StateTests
     [Fact]
     public void State_AddTransition_AddsTransitionToTransitions()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         _state.AddChild(from);
         _state.AddChild(to);
 
@@ -662,8 +794,8 @@ public class StateTests
     [Fact]
     public void State_AddTransition_ThrowsArgumentExceptionIfFromStateNotInChildren()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         _state.AddChild(to);
 
         Assert.Throws<ArgumentException>(() => _state.AddTransition(from.Id, to.Id, new EventId("event")));
@@ -672,8 +804,8 @@ public class StateTests
     [Fact]
     public void State_AddTransition_ThrowsArgumentExceptionIfToStateNotInChildren()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         _state.AddChild(from);
 
         Assert.Throws<ArgumentException>(() => _state.AddTransition(from.Id, to.Id, new EventId("event")));
@@ -682,8 +814,8 @@ public class StateTests
     [Fact]
     public void State_AddTransition_ThrowsArgumentExceptionIfFromStateIsTheSameAsToState()
     {
-        State from = new(new StateId("from"));
         StateId fromId = new("from");
+        State from = new(new StateId("from"));
         _state.AddChild(from);
 
         Assert.Throws<ArgumentException>(() => _state.AddTransition(from.Id, fromId, new EventId("event")));
@@ -698,8 +830,8 @@ public class StateTests
     [InlineData("\n")]
     public void State_AddTransition_ThrowsArgumentExceptionIfOnEventIdIsNullEmptyOrWhiteSpace(string eventId)
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         _state.AddChild(from);
         _state.AddChild(to);
 
@@ -709,8 +841,8 @@ public class StateTests
     [Fact]
     public void State_RemoveTransition_ReturnsCaller()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         _state.AddChild(from);
         _state.AddChild(to);
@@ -724,8 +856,8 @@ public class StateTests
     [Fact]
     public void State_RemoveTransition_RemovesTransition()
     {
-        State from = new(new StateId("from"));
-        State to = new(new StateId("to"));
+        State from = new("from");
+        State to = new("to");
         EventId transitionEvent = new("event");
         _state.AddChild(from);
         _state.AddChild(to);
@@ -748,7 +880,7 @@ public class StateTests
     public void State_AddEnterBehavior_AddsActionToEnterBehavior()
     {
         bool check = false;
-        Machine machine = new(new StateId("machine"));
+        Machine machine = new("machine");
 
         machine.AddEnterBehavior(() => check = true);
         machine.Enter();
@@ -769,7 +901,7 @@ public class StateTests
     {
         bool check = false;
         void behavior() => check = true;
-        Machine machine = new(new StateId("machine"));
+        Machine machine = new("machine");
         machine.AddEnterBehavior(behavior);
 
         machine.RemoveEnterBehavior(behavior);
@@ -790,7 +922,7 @@ public class StateTests
     public void State_AddUpdateBehavior_AddsActionToUpdateBehavior()
     {
         bool check = false;
-        Machine machine = new(new StateId("machine"));
+        Machine machine = new("machine");
 
         machine.AddUpdateBehavior(() => check = true);
         machine.Enter();
@@ -812,7 +944,7 @@ public class StateTests
     {
         bool check = false;
         void behavior() => check = true;
-        Machine machine = new(new StateId("machine"));
+        Machine machine = new("machine");
         machine.AddUpdateBehavior(behavior);
 
         machine.RemoveUpdateBehavior(behavior);
@@ -834,7 +966,7 @@ public class StateTests
     public void State_AddExitBehavior_AddsActionToExitBehavior()
     {
         bool check = false;
-        Machine machine = new(new StateId("machine"));
+        Machine machine = new("machine");
         machine.AddExitBehavior(() => check = true);
 
         machine.Enter();
@@ -856,7 +988,7 @@ public class StateTests
     {
         bool check = false;
         void behavior() => check = true;
-        Machine machine = new(new StateId("machine"));
+        Machine machine = new("machine");
         machine.AddExitBehavior(behavior);
 
         machine.RemoveExitBehavior(behavior);

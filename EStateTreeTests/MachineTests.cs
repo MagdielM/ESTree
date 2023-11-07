@@ -18,7 +18,7 @@ public class MachineTests
     [InlineData("\n")]
     public void Machine_Constructor_ThrowsArgumentExceptionWithNullEmptyOrWhiteSpaceIdString(string idString)
     {
-        Assert.Throws<ArgumentException>(() => new Machine(new(idString)));
+        Assert.Throws<ArgumentException>(() => new Machine(new StateId(idString)));
     }
 
     [Fact]
