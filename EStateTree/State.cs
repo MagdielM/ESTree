@@ -525,7 +525,7 @@ public class State
     /// called top-to-bottom: the behavior of the outermost states will be invoked before that
     /// of the innermost states.
     /// </remarks>
-    protected void EnterState()
+    internal void EnterState()
     {
         enterBehavior?.Invoke();
         if (Children.TryGetValue(ActiveChildId, out State child))
@@ -544,7 +544,7 @@ public class State
     /// behaviors of the active branch being called top-to-bottom: the behavior of the
     /// outermost states will be invoked before that of the innermost states.
     /// </remarks>
-    protected void UpdateState()
+    internal void UpdateState()
     {
         updateBehavior?.Invoke();
         if (Children.TryGetValue(ActiveChildId, out State child))
@@ -564,7 +564,7 @@ public class State
     /// bottom-to-top: the behavior of the innermost states will be invoked before that of the
     /// outermost states.
     /// </remarks>
-    protected void ExitState()
+    internal void ExitState()
     {
         if (Children.TryGetValue(ActiveChildId, out State child))
         {
@@ -573,7 +573,7 @@ public class State
         exitBehavior?.Invoke();
     }
 
-    private bool TryHandleEvent(EventId eventId)
+    internal bool TryHandleEvent(EventId eventId)
     {
         if (!EventResponses.TryGetValue(eventId, out EventResponse eventResponse)) return false;
 
@@ -582,7 +582,7 @@ public class State
         return eventResponse.ShouldConsumeEvent;
     }
 
-    private bool TryTransition(EventId eventId)
+    internal bool TryTransition(EventId eventId)
     {
         if (!Transitions.TryGetValue(new TransitionId(eventId, ActiveChildId), out Transition transition)) return false;
 
