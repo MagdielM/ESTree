@@ -7,9 +7,9 @@
 /// <remarks>
 /// <para>
 /// States may contain any number of child states, and consider only one of these children to
-/// be active at any given time. Any individual lineage of children in a state machine is
-/// known as a branch. The lineage of all children in the containing machine that are
-/// considered active at one time is known as the active branch.
+/// be active at any given time. Any individual lineage of children in a state is known as a
+/// branch. The lineage of all descendants of the containing state that are considered active
+/// at one time is known as the active branch.
 /// </para>
 ///
 /// <para>
@@ -133,6 +133,7 @@ public class State
             throw new KeyNotFoundException($"State {id.Id} does not contain a child with ID {id.Id}.", ex);
         }
     }
+    public State GetChild(string id) => GetChild(new StateId(id));
 
     /// <summary>
     /// Returns a collection of all of this state's children.
@@ -333,7 +334,8 @@ public class State
     ///
     /// <exception cref="ArgumentException">
     /// <para>
-    /// No child among this state's children have either the <paramref name="from"/> or <paramref name="to"/> IDs.
+    /// No child among this state's children have either the <paramref name="from"/> or
+    /// <paramref name="to"/> IDs.
     /// </para>
     ///
     /// <para>-or-</para>
@@ -614,7 +616,7 @@ public class State
         }
         else
         {
-        Children[ActiveChildId].ExitState();
+            Children[ActiveChildId].ExitState();
         }
 
         transition.Behavior?.Invoke();
@@ -626,7 +628,7 @@ public class State
         }
         else
         {
-        Children[ActiveChildId].EnterState();
+            Children[ActiveChildId].EnterState();
         }
 
         return true;
