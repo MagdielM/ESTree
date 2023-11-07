@@ -467,7 +467,8 @@ public class State
 
     /// <summary>
     /// Attempts to consume the specified event and propagates it up the tree if it is not
-    /// consumed, with each subsequent parent attempting to consume it.
+    /// consumed, with each subsequent parent attempting to consume it. Does nothing if the
+    /// state is part of a hierarchy and is not the active child of its parent.
     /// </summary>
     ///
     /// <remarks>
@@ -481,6 +482,8 @@ public class State
     /// <param name="eventId">The event to be propagated upwards.</param>
     public void FireEvent(EventId eventId)
     {
+        if (Parent != null && Parent.ActiveChildId != Id) return;
+
         if (TryTransition(eventId)) return;
 
         if (TryHandleEvent(eventId)) return;
@@ -490,7 +493,8 @@ public class State
 
     /// <summary>
     /// Propagates the specified event down the tree, with each subsequent active child
-    /// attempting to consume it.
+    /// attempting to consume it. Does nothing if the state is part of a hierarchy and is not
+    /// the active child of its parent.
     /// </summary>
     ///
     /// <remarks>
@@ -504,6 +508,7 @@ public class State
     /// <param name="eventId">The event to be propagated downwards.</param>
     public void DrillEvent(EventId eventId)
     {
+        if (Parent != null && Parent.ActiveChildId != Id) return;
         if (Children.Count == 0) return;
 
         State child = Children[ActiveChildId];
