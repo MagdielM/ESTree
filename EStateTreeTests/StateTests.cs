@@ -18,7 +18,7 @@ public class StateTests
     [InlineData("\n")]
     public void State_Constructor_ThrowsArgumentExceptionWithNullEmptyOrWhiteSpaceIdString(string idString)
     {
-        Assert.Throws<ArgumentException>(() => new State(new(idString)));
+        Assert.Throws<ArgumentException>(() => new State(new StateId(idString)));
     }
 
     [Fact]

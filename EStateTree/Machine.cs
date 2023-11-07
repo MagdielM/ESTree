@@ -13,9 +13,8 @@ public class Machine : State
     /// <exception cref="ArgumentException">
     /// <paramref name="id"/> is <c>null</c>, empty, or comprised solely of whitespace.
     /// </exception>
-    public Machine(StateId id) : base(id)
-    {
-    }
+    public Machine(StateId id) : base(id) { }
+    public Machine(string id) : base(id) { }
 
     /// <summary>
     /// Executes the <see cref="State.EnterState"/> method of this machine. Does nothing if

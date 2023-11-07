@@ -105,11 +105,13 @@ public class State
 
         Id = id;
     }
+    public State(string id) : this(new StateId(id)) {}
 
     /// <summary>
     /// Indexer equivalent to <see cref="GetChild(StateId)"/>.
     /// </summary>
     public State this[StateId id] { get => GetChild(id); }
+    public State this[string id] { get => GetChild(new StateId(id)); }
 
     /// <summary>
     /// Gets the child state with the specified <see cref="StateId"/>.
